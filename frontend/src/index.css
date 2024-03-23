@@ -13,6 +13,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
 
 body {
   margin: 0;
@@ -20,4 +27,38 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-container {
+  margin-top: 20px;
+}
+
+.sign-in-button {
+  padding: 10px 10px;
+  border: none;
+  background-color: white;
+  color: #001529;
+  font-weight: bold;
+  font-size: normal;
+  border-radius: 10px;
+}
+
+.sign-in-button:hover {
+  cursor: pointer;
+  background-color: #134d83;
+  color: white;
+}
+
+.player-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
 }
