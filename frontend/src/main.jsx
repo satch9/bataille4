@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { SocketContext, socket } from './context/SocketContext'
 
 import RootLayout from './layouts/root-layout'
 
@@ -17,13 +18,15 @@ const router = createBrowserRouter([
       { path: "/", element: <IndexPage /> },
       { path: "/sign-in", element: <SignInPage /> },
       { path: "/sign-up", element: <SignUpPage /> },
-      { path: "/params", element: <Parameters />},
+      { path: "/params", element: <Parameters /> },
     ]
-  } 
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-     <RouterProvider router={router} />
+    <SocketContext.Provider value={socket} >
+      <RouterProvider router={router} />
+    </SocketContext.Provider>
   </React.StrictMode>,
 )

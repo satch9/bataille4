@@ -1,6 +1,9 @@
+import { useContext, useEffect } from 'react'
 import { Card, Typography, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
+
+import { SocketContext } from '../context/SocketContext';
 
 const { Title, Paragraph } = Typography;
 
@@ -10,8 +13,15 @@ let content = "Le jeu de cartes la Bataille est un jeu simple où deux joueurs s
 export default function IndexPage() {
   const navigate = useNavigate();
   const { isSignedIn } = useAuth();
+  const socket = useContext(SocketContext)
 
   console.log("isSignedIn ", isSignedIn)
+
+  useEffect(() => {
+    if (socket !== undefined) {
+      console.log("socket", socket.id)
+    }
+  }, [socket])
 
   return (
     <div className="home-container">
