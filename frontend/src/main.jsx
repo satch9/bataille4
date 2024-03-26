@@ -2,7 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+<<<<<<< HEAD
 import { SocketContext, socket } from './context/SocketContext'
+=======
+import { SocketContext, socket } from './context/SocketContext.js'
+>>>>>>> e4e0cac (suite mise en place de socket dans le frontend et dans le backend)
 
 import RootLayout from './layouts/root-layout'
 
@@ -28,5 +32,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <SocketContext.Provider value={socket} >
       <RouterProvider router={router} />
     </SocketContext.Provider>
+<<<<<<< HEAD
+=======
+
+>>>>>>> e4e0cac (suite mise en place de socket dans le frontend et dans le backend)
   </React.StrictMode>,
 )
