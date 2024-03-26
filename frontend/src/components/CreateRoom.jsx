@@ -1,19 +1,39 @@
 import { Form, Input, Select, Button, message } from "antd"
-import { useCallback } from 'react'
+import { useCallback, useEffect, useContext } from 'react'
 import { useUser } from '@clerk/clerk-react'
+
+import { SocketContext } from '../context/SocketContext';
 
 const CreateRoom = () => {
     const [form] = Form.useForm()
     const [messageApi, contextHolder] = message.useMessage()
     const { user } = useUser()
+    const socket = useContext(SocketContext)
 
     const info = useCallback((text) => {
         messageApi.info(text);
     }, [messageApi])
 
+    useEffect(() => {
+        if (socket) {
+            console.log("socket", socket)
+
+            const handleCreatedRoom = (data) => {
+                info(`Salle "${data.room_name}" créée par ${data.room_creator} avec un jeu de ${data.room_number_of_cards} cartes`);
+            };
+
+            socket.on("created room", handleCreatedRoom)
+
+            return () => { 
+                socket.off("created room", handleCreatedRoom)
+            }
+        }
+    }, [socket, info])
+
     const onCreateRoom = (values) => {
         console.log("values [createRoom]", values);
-        info(`Salle "${values.roomName}" créé par ${user.username}`)
+
+        socket.emit("create room", { roomName: values.roomName, roomCreator: user.username, roomNumCards: parseInt(values.roomNumCards) })
     }
 
     const onFinish = () => {
@@ -40,7 +60,7 @@ const CreateRoom = () => {
                 <Input placeholder="Nom de la salle" />
             </Form.Item>
             <Form.Item
-                name="numCards"
+                name="roomNumCards"
                 rules={[
                     { required: true, message: "Veuillez saisir le nombre de carte dans votre paquet!" },
                 ]}

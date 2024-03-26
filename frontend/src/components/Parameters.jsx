@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { Card } from 'antd'
+
+import { SocketContext } from '../context/SocketContext';
+
 import RoomList from './RoomList';
 import CreateRoom from './CreateRoom';
 import ScoreBoard from './ScoreBoard';
@@ -31,6 +34,11 @@ export default function Parameters() {
             score: 5
         }
     ]
+    const socket = useContext(SocketContext)
+
+    useEffect(() => {
+        console.log("socket", socket)
+    }, [socket])
 
     useEffect(() => {
         setRoomList([])

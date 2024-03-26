@@ -28,7 +28,6 @@ ScoreBoard.propTypes = {
     players: PropTypes.arrayOf(
         PropTypes.shape({
             name: PropTypes.string.isRequired,
-            avatar: PropTypes.string.isRequired,
             score: PropTypes.number.isRequired,
         })
     ).isRequired,

@@ -54,10 +54,6 @@ const Game = sequelize.define('Game', {
         type: Sequelize.INTEGER,
         allowNull: true,
     },
-    game_start_date: {
-        type: Sequelize.DATE,
-        allowNull: true,
-    },
     game_end_date: {
         type: Sequelize.DATE,
         allowNull: true,
