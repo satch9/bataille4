@@ -37,12 +37,17 @@ export default function Parameters() {
     const socket = useContext(SocketContext)
 
     useEffect(() => {
-        console.log("socket", socket)
+        //console.log("socket [Parameters]", socket)
+        socket.on("get all rooms", (data)=>{
+            //console.log("[Parameters] get all rooms : ", data);
+            setRoomList(data)
+        })
+
+        return () => {
+            socket.off()
+        }
     }, [socket])
 
-    useEffect(() => {
-        setRoomList([])
-    }, [])
 
     const onTab2Change = (key) => {
         setActiveTabKey(key)

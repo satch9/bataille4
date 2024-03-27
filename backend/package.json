@@ -8,7 +8,6 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^9.4.3",
     "cors": "^2.8.5",
     "express": "^5.0.0-beta.2",
     "lodash": "^4.17.21",

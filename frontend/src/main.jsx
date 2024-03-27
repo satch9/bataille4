@@ -10,6 +10,7 @@ import IndexPage from './routes'
 import SignInPage from './routes/sign-in'
 import SignUpPage from './routes/sign-up'
 import Parameters from './components/Parameters'
+import GameBoard from './components/GameBoard'
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { path: "/sign-in", element: <SignInPage /> },
       { path: "/sign-up", element: <SignUpPage /> },
       { path: "/params", element: <Parameters /> },
+      { path: "/gameboard", element: <GameBoard /> },
     ]
   }
 ])

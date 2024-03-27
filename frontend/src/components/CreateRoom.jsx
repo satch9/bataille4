@@ -19,12 +19,13 @@ const CreateRoom = () => {
             console.log("socket", socket)
 
             const handleCreatedRoom = (data) => {
-                info(`Salle "${data.room_name}" créée par ${data.room_creator} avec un jeu de ${data.room_number_of_cards} cartes`);
+                console.log("data created room", data)
+                info(`Salle "${data.room_name}" créée par ${data.room_creator_name} avec un jeu de ${data.room_number_of_cards} cartes`);
             };
 
             socket.on("created room", handleCreatedRoom)
 
-            return () => { 
+            return () => {
                 socket.off("created room", handleCreatedRoom)
             }
         }
