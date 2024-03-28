@@ -1,19 +1,19 @@
 const socketio = require("socket.io");
 
 const initializeSocket = (server) => {
-  const io = socketio(server, {
+  /* const io = socketio(server, {
     cors: {
       origin: "https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
       methods: ["GET", "POST"],
     }
-  })
+  }) */
 
-  /* const io = socketio(server, {
-        cors: {
-            origin: "http://localhost:5173", // Modifier en fonction de votre configuration frontend
-            methods: ["GET", "POST"],
-        }
-    }) */
+  const io = socketio(server, {
+    cors: {
+      origin: "http://localhost:5173", // Modifier en fonction de votre configuration frontend
+      methods: ["GET", "POST"],
+    }
+  })
 
   /* const io = socketio(server, {
     cors: {
@@ -91,18 +91,23 @@ const initializeSocket = (server) => {
 
         // Ajouter le joueur à la salle
         const player = await Player.findPlayerByName(username)
-        
+        console.log("player joinRoom", player)
         if (player.length === 0) {
           const playerCreated = await Player.addPlayer(username, userId)
 
           if (room.room_creator !== playerCreated.player_id) {
             console.log("room joined", roomId);
+            socket.join(roomId);
             // Mettre à jour les données de la salle pour inclure le joueur
             await GamePlayers.addPlayerToRoom(roomId, playerCreated);
           }
+        } else {
+          socket.join(roomId);
+          io.to(roomId).emit("player joined room", username);
         }
 
-        socket.to(roomId).emit("player joined room", userId);
+
+
       } catch (error) {
         console.error(
           "Erreur lors de la tentative de rejoindre la salle :",
