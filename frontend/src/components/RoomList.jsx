@@ -14,7 +14,8 @@ const RoomList = ({ rooms }) => {
   const { user } = useUser();
 
   const handleJoinRoom = (room) => {
-    console.log(`Joining room ${room.name}`);
+
+    console.log(`Joining room ${room.room_name}`);
     setLoading(true);
     // Simulez une action de chargement pendant quelques secondes
     setTimeout(() => {
@@ -29,7 +30,7 @@ const RoomList = ({ rooms }) => {
   };
 
   const renderItem = (room) => {
-    //console.log("room roomlist", room.room_id);
+    //console.log("room roomlist", room);
     return (
       <List.Item
         actions={[

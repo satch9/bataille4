@@ -2,10 +2,10 @@ const { sequelize } = require("../database/db");
 
 class GamePlayers {
   constructor(gameId, playerId) {
-    this.gamePlayers_GameGameId = gameId;
-    this.gamePlayers_PlayerPlayerId = playerId;
-    this.gamePlayers_score = 0;
-    this.gamePlayers_hand = null;
+    this.gamePlayers_GameGameId = gameId
+    this.gamePlayers_PlayerPlayerId = playerId
+    this.gamePlayers_score = 0
+    this.gamePlayers_hand = null
   }
 
   async createGamePlayersToDatabase() {
@@ -19,8 +19,8 @@ class GamePlayers {
       console.error(
         `Erreur lors de l'enregistrement dans la base de données de la table GamePlayers :`,
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 
@@ -30,12 +30,15 @@ class GamePlayers {
         GameGameId: roomid,
         PlayerPlayerId: player.player_id,
       });
+      await newPlayerIntoRoom.save()
+      //console.log(JSON.stringify(newPlayerIntoRoom, null, 4))
+      return newPlayerIntoRoom
     } catch (error) {
       console.error(
         `Erreur lors de l'enregistrement dans la base de données de la table GamePlayers :`,
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 }

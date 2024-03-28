@@ -1,12 +1,12 @@
 const socketio = require("socket.io");
 
 const initializeSocket = (server) => {
-  /* const io = socketio(server, {
-        cors: {
-            origin: "https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
-            methods: ["GET", "POST"],
-        }
-    }) */
+  const io = socketio(server, {
+    cors: {
+      origin: "https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
+      methods: ["GET", "POST"],
+    }
+  })
 
   /* const io = socketio(server, {
         cors: {
@@ -15,12 +15,12 @@ const initializeSocket = (server) => {
         }
     }) */
 
-  const io = socketio(server, {
+  /* const io = socketio(server, {
     cors: {
       origin: "https://xg3tgf-5173.csb.app", // Modifier en fonction de votre configuration frontend
       methods: ["GET", "POST"],
     },
-  });
+  }); */
 
   const Room = require("./src/models/Room");
   const Player = require("./src/models/Player");
@@ -80,22 +80,28 @@ const initializeSocket = (server) => {
         await gamePlayers.createGamePlayersToDatabase();
     });
 
-    socket.on("joinRoom", async ({ roomId, username }) => {
+    socket.on("joinRoom", async ({
+      roomId,
+      username
+    }) => {
       try {
         // Vérifier si la salle existe
-        const room = await Room.findRoomById(roomId);
-        if (!room) throw "La salle n'existe pas.";
+        const room = await Room.findRoomById(roomId)
+        if (!room) throw "La salle n'existe pas."
 
         // Ajouter le joueur à la salle
-        const player = await Player.findPlayerByName(username);
-        if (!player) {
-          throw new Error("Le joueur n'existe pas.");
+        const player = await Player.findPlayerByName(username)
+        
+        if (player.length === 0) {
+          const playerCreated = await Player.addPlayer(username, userId)
+
+          if (room.room_creator !== playerCreated.player_id) {
+            console.log("room joined", roomId);
+            // Mettre à jour les données de la salle pour inclure le joueur
+            await GamePlayers.addPlayerToRoom(roomId, playerCreated);
+          }
         }
-        if (room.room_creator !== player.player_id) {
-          console.log("room joined", roomId);
-          // Mettre à jour les données de la salle pour inclure le joueur
-          await GamePlayers.addPlayerToRoom(roomId, player);
-        }
+
         socket.to(roomId).emit("player joined room", userId);
       } catch (error) {
         console.error(

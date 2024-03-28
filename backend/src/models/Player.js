@@ -1,4 +1,7 @@
-const { db, sequelize } = require("../database/db");
+const {
+  db,
+  sequelize
+} = require("../database/db");
 
 class Player {
   constructor(player_socket_id, player_name) {
@@ -32,10 +35,27 @@ class Player {
     }
   }
 
+  static async addPlayer(name, socketId) {
+    try {
+      let newPlayerIntoRoom = await sequelize.models.Player.create({
+        player_name: name,
+        player_socket_id: socketId,
+      })
+      await newPlayerIntoRoom.save()
+      //console.log(JSON.stringify(newPlayerIntoRoom, null, 4))
+      return newPlayerIntoRoom
+    } catch (error) {
+      console.error(
+        `Erreur lors de l'enregistrement dans la base de données de la table GamePlayers :`,
+        error,
+      )
+      throw error
+    }
+  }
+
   static async findPlayerByName(name) {
     const [results, metadata] = await sequelize.query(
-      "SELECT * FROM Players WHERE player_name=? ",
-      {
+      "SELECT * FROM Players WHERE player_name=? ", {
         replacements: [name],
       },
     );
@@ -60,8 +80,7 @@ class Player {
   static async findPlayerBySocketId(socketId) {
     try {
       const [results, metadata] = await sequelize.query(
-        "SELECT * FROM Players WHERE player_socket_id=? ",
-        {
+        "SELECT * FROM Players WHERE player_socket_id=? ", {
           replacements: [socketId],
         },
       );
