@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { SocketContext, socket } from './context/SocketContext'
+import { Provider } from 'react-redux'
+import store from './redux/store'
 
 import RootLayout from './layouts/root-layout'
 
@@ -27,8 +29,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+
     <SocketContext.Provider value={socket} >
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </SocketContext.Provider>
+
   </React.StrictMode>,
 )
