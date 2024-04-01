@@ -1,4 +1,7 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const {
+  Sequelize,
+  DataTypes
+} = require("sequelize");
 
 // Créez une instance Sequelize avec les informations de connexion à votre base de données SQLite
 const sequelize = new Sequelize({
@@ -9,8 +12,7 @@ const sequelize = new Sequelize({
 
 // Définissez vos modèles (tables) ici
 const Player = sequelize.define(
-  "Player",
-  {
+  "Player", {
     // Définissez vos champs (colonnes) ici
     player_id: {
       type: DataTypes.INTEGER,
@@ -26,8 +28,7 @@ const Player = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-  },
-  {
+  }, {
     timestamps: true,
     createdAt: "player_createdAt",
     updatedAt: "player_updatedAt",
@@ -35,8 +36,7 @@ const Player = sequelize.define(
 );
 
 const Game = sequelize.define(
-  "Game",
-  {
+  "Game", {
     // Définissez vos champs (colonnes) ici
     game_id: {
       type: DataTypes.INTEGER,
@@ -51,6 +51,10 @@ const Game = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    game_start_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     game_end_date: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -59,17 +63,17 @@ const Game = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-  },
-  {
-    timestamps: true,
-    createdAt: "game_start_date",
-    updatedAt: "game_updatedAt",
-  },
+    game_updated_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    }
+  },{
+    timestamps: false,
+  }
 );
 
 const Room = sequelize.define(
-  "Room",
-  {
+  "Room", {
     // Définissez vos champs (colonnes) ici
     room_id: {
       type: DataTypes.INTEGER,
@@ -93,8 +97,7 @@ const Room = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-  },
-  {
+  }, {
     timestamps: true,
     createdAt: "room_createdAt",
     updatedAt: "room_updatedAt",
@@ -105,8 +108,7 @@ const Room = sequelize.define(
 Room.belongsTo(Game) */
 
 const GamePlayers = sequelize.define(
-  "GamePlayers",
-  {
+  "GamePlayers", {
     gamePlayers_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -122,8 +124,7 @@ const GamePlayers = sequelize.define(
       type: DataTypes.TEXT("medium"),
       allowNull: true,
     },
-  },
-  {
+  }, {
     timestamps: true,
     createdAt: "gamePlayers_createdAt",
     updatedAt: "gamePlayers_updatedAt",

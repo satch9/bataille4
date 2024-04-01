@@ -6,6 +6,7 @@ const gameSlice = createSlice({
     name: "game",
     initialState: {
         gameId: null,
+        roomId: null,
         playerName: "",
         creator: null,
         players: [],
@@ -23,6 +24,12 @@ const gameSlice = createSlice({
                 gameId: action.payload
             }
         },
+        setRoomId(state, action) {
+            return {
+                ...state,
+                roomId: action.payload
+            }
+        },
         setPlayerName(state, action) {
             return {
                 ...state,
@@ -33,12 +40,13 @@ const gameSlice = createSlice({
             state.creator = action.payload
             if (action.payload === true) {
                 state.players.push(state.playerName);
-            } else {
-                const index = state.players.indexOf(state.playerName);
-                if (index > -1) {
-                    state.players.splice(index, 1);
-                }
             }
+            /* else {
+                           const index = state.players.indexOf(state.playerName);
+                           if (index > -1) {
+                               state.players.splice(index, 1);
+                           }
+                       } */
         },
         setPlayers(state, action) {
             return {

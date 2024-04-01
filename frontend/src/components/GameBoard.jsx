@@ -1,15 +1,18 @@
-import { useContext, useEffect, useCallback } from "react"
+import { useContext, useEffect, useCallback, useState } from "react"
 import { SocketContext } from "../context/SocketContext"
 import { message, Col, Row, Button } from "antd"
-import { useSelector } from 'react-redux'
 import { useParams } from "react-router-dom"
+import { useSelector, useDispatch } from 'react-redux'
+import { actions as gameActions } from "../redux/reducers/gameReducer"
+
 
 const GameBoard = () => {
-    let { roomId } = useParams();
+    const { roomId } = useParams();
     const [messageApi, contextHolder] = message.useMessage()
     const socket = useContext(SocketContext)
+    const dispatch = useDispatch();
     const game = useSelector(state => state.game)
-    //const dispatch = useDispatch()
+    const [isGameStarting, setIsGameStarting] = useState(false);
 
     const info = useCallback((text) => {
         messageApi.info(text);
@@ -18,28 +21,47 @@ const GameBoard = () => {
     console.log("game", game)
 
     useEffect(() => {
-        const handleJoinedRoom = (username) => {
-            info(`Le joueur ${username} a rejoint la partie`)
-
-            // On ajoute le nom du joueur à l'état de Redux pour que les composants enfants puissent accéder au nom
-
+        const handleJoinedRoom = (data) => {
+            console.log("data handlejoinedRoom : ", data)
+            info(`Le joueur ${data.player_name} a rejoint la partie`)
+            dispatch(gameActions.setPlayers([...game.players, data.player_name]));
         }
+
+        const handleGameStarted = () => {
+            info('La partie peut commencer')
+            dispatch(gameActions.setGameStarted(true));
+        }
+
         socket.on("player joined room", handleJoinedRoom)
+        socket.on("game started", handleGameStarted)
 
         return () => {
             socket.off("player joined room", handleJoinedRoom)
+            socket.off("game started", handleGameStarted)
         }
-    }, [socket, info])
+    }, [socket, info, dispatch, game.players])
 
     const handleStartGame = () => {
         // Send a "start game" message to the server
+        setIsGameStarting(true);
         socket.emit("start game", (roomId));
     };
 
     return (
         <div className="game-board">
             {contextHolder}
-            <Button type="primary" onClick={handleStartGame}>Débuter la partie</Button>
+            {
+                game.creator && game.players.length == 2 && (
+                    <Button
+                        type="primary"
+                        onClick={handleStartGame}
+                        disabled={isGameStarting || game.gameStarted}
+                    >
+                        Débuter la partie
+                    </Button>
+                )
+            }
+
 
             {
                 game.gameStarted && (

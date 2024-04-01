@@ -4,22 +4,33 @@ import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../context/SocketContext";
 import { useUser } from "@clerk/clerk-react";
+import { useDispatch, useSelector } from 'react-redux'
+import { actions as gameActions } from "../redux/reducers/gameReducer"
 
 import PropTypes from "prop-types";
 
 const RoomList = ({ rooms }) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingState, setLoadingState] = useState({});
   const navigate = useNavigate();
   const socket = useContext(SocketContext);
   const { user } = useUser();
+  const dispatch = useDispatch();
+  const game = useSelector(state => state.game)
 
   const handleJoinRoom = (room) => {
 
-    console.log(`Joining room ${room.room_name}`);
-    setLoading(true);
+    console.log("Joining room", JSON.stringify(room));
+    setLoadingState((prevState) => ({
+      ...prevState,
+      [room.room_id]: true, // Définir l'état de chargement pour cet élément de la liste
+    }));
     // Simulez une action de chargement pendant quelques secondes
     setTimeout(() => {
-      setLoading(false);
+      setLoadingState((prevState) => ({
+        ...prevState,
+        [room.room_id]: false, // Définir l'état de chargement pour cet élément de la liste
+      }));
+      dispatch(gameActions.setPlayers([...game.players, user.username]));
       // Ajoutez ici le code pour rejoindre la salle
       socket.emit("joinRoom", {
         roomId: room.room_id,
@@ -31,6 +42,7 @@ const RoomList = ({ rooms }) => {
 
   const renderItem = (room) => {
     //console.log("room roomlist", room);
+    const isLoading = loadingState[room.room_id] || false
     return (
       <List.Item
         actions={[
@@ -38,9 +50,9 @@ const RoomList = ({ rooms }) => {
             key="join"
             type="dashed"
             onClick={() => handleJoinRoom(room)}
-            disabled={loading}
+            disabled={isLoading}
           >
-            Rejoindre {loading && <Spin size="small" />}
+            Rejoindre {isLoading && <Spin size="small" />}
           </Button>,
         ]}
       >

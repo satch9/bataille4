@@ -4,11 +4,15 @@ import { useUser } from '@clerk/clerk-react'
 
 import { SocketContext } from '../context/SocketContext';
 
+import { useDispatch } from 'react-redux'
+import { actions as gameActions } from "../redux/reducers/gameReducer"
+
 const CreateRoom = () => {
     const [form] = Form.useForm()
     const [messageApi, contextHolder] = message.useMessage()
     const { user } = useUser()
     const socket = useContext(SocketContext)
+    const dispatch = useDispatch();
 
     const info = useCallback((text) => {
         messageApi.info(text);
@@ -20,19 +24,29 @@ const CreateRoom = () => {
 
             const handleCreatedRoom = (data) => {
                 console.log("data created room", data)
+                dispatch(gameActions.setCreator(data.room_creator), true)
+                dispatch(gameActions.setPlayerName(data.room_creator_name))
                 info(`Salle "${data.room_name}" créée par ${data.room_creator_name} avec un jeu de ${data.room_number_of_cards} cartes`);
             };
 
+            const handleCreatedGame = (data) => {
+                console.log("data created game", data)
+                dispatch(gameActions.setGameId(data.game_id))
+            }
+
             socket.on("created room", handleCreatedRoom)
+            socket.on("created game", handleCreatedGame)
 
             return () => {
                 socket.off("created room", handleCreatedRoom)
+                socket.off("created game", handleCreatedGame)
             }
         }
-    }, [socket, info])
+    }, [socket, info, dispatch])
 
     const onCreateRoom = (values) => {
         console.log("values [createRoom]", values);
+
 
         socket.emit("create room", { roomName: values.roomName, roomCreator: user.username, roomNumCards: parseInt(values.roomNumCards) })
     }
