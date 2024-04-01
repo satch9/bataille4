@@ -2,9 +2,10 @@ import { useContext, useEffect, useCallback } from "react"
 import { SocketContext } from "../context/SocketContext"
 import { message, Col, Row, Button } from "antd"
 import { useSelector } from 'react-redux'
-
+import { useParams } from "react-router-dom"
 
 const GameBoard = () => {
+    let { roomId } = useParams();
     const [messageApi, contextHolder] = message.useMessage()
     const socket = useContext(SocketContext)
     const game = useSelector(state => state.game)
@@ -32,7 +33,7 @@ const GameBoard = () => {
 
     const handleStartGame = () => {
         // Send a "start game" message to the server
-        socket.emit("start game");
+        socket.emit("start game", (roomId));
     };
 
     return (
@@ -41,7 +42,7 @@ const GameBoard = () => {
             <Button type="primary" onClick={handleStartGame}>Débuter la partie</Button>
 
             {
-                game && (
+                game.gameStarted && (
                     <Row gutter={[8, 24]}>
                         <Col style={{ background: '#0092ff', paddingTop: '8px', paddingBottom: '8px' }}
                             xs={{ flex: '100%' }}

@@ -1,4 +1,6 @@
-const { sequelize } = require("../database/db");
+const {
+  sequelize
+} = require("../database/db");
 
 const Player = require("./Player");
 
@@ -14,33 +16,34 @@ class Room {
 
   async createRoomToDatabase() {
     try {
-      const roomNameExist = await Room.findRoomByName(this.room_name);
+      let room = await Room.findRoomByName(this.room_name);
       //console.log("roomNameExist", roomNameExist)
-      if (roomNameExist.length === 0) {
-        let newRoom = await sequelize.models.Room.create({
+      if (room.length === 0) {
+        room = await sequelize.models.Room.create({
           room_name: this.room_name,
           room_creator: this.room_creator,
           room_number_of_cards: this.room_number_of_cards,
         });
 
-        // Récupérer les détails du joueur créateur
-        const creatorDetails = await Player.findPlayerById(this.room_creator);
-        if (creatorDetails) {
-          newRoom.room_creator_name = creatorDetails.player_name;
-          await newRoom.save();
-        } else {
-          console.warn(
-            "Impossible de trouver les détails du créateur de la salle.",
-          );
-        }
-        //console.log("newRoom", newRoom)
-        return newRoom;
+      } else {
+        room = room[0]
+      }
+
+      // Récupérer les détails du joueur créateur
+      console.log("this.room_creator", this.room_creator)
+      const creatorDetails = await Player.findPlayerById(this.room_creator);
+      console.log("creatorDetails", creatorDetails)
+      if (creatorDetails) {
+        room.room_creator_name = creatorDetails.player_name;
+        await room.save();
       } else {
         console.warn(
-          "Impossible d'enregistrer cette salle car elle existe déjà.",
+          "Impossible de trouver les détails du créateur de la salle.",
         );
-        return roomNameExist;
       }
+      //console.log("newRoom", newRoom)
+      return room;
+
     } catch (error) {
       console.error(
         `Erreur lors de l'enregistrement de la salle ${this.room_name} dans la base de données :`,

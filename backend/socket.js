@@ -1,19 +1,22 @@
+const {
+  forEach
+} = require("lodash");
 const socketio = require("socket.io");
 
 const initializeSocket = (server) => {
-  const io = socketio(server, {
+  /* const io = socketio(server, {
     cors: {
       origin: "https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
       methods: ["GET", "POST"],
     }
-  })
+  }) */
 
-  /* const io = socketio(server, {
+  const io = socketio(server, {
     cors: {
       origin: "http://localhost:5173", // Modifier en fonction de votre configuration frontend
       methods: ["GET", "POST"],
     }
-  }) */
+  })
 
   /* const io = socketio(server, {
     cors: {
@@ -54,30 +57,38 @@ const initializeSocket = (server) => {
     socket.on("create room", async (values) => {
       console.log("Creating a new room...", values);
 
-      const creator = new Player(userId, values.roomCreator);
-      const player = await creator.saveCreatorToDatabase();
-      //console.log("player", player)
+      try {
+        const creator = new Player(userId, values.roomCreator);
+        const player = await creator.saveCreatorToDatabase();
+        console.log("player saved in database [create room] : ", player);
 
-      const room = new Room(
-        values.roomName,
-        values.roomNumCards,
-        player.player_id,
-      );
-      const roomCreated = await room.createRoomToDatabase();
-      console.log("roomCreated", JSON.stringify(roomCreated, null, 2));
+        const room = new Room(
+          values.roomName,
+          values.roomNumCards,
+          player.player_id,
+        );
+        const roomCreated = await room.createRoomToDatabase();
+        console.log("roomCreated", JSON.stringify(roomCreated, null, 2));
 
-      socket.emit("created room", roomCreated);
-      socket.join(roomCreated.room_id);
+        socket.emit("created room", roomCreated);
+        socket.join(roomCreated.room_id);
 
-      const game = new Game(roomCreated.room_id);
-      const gameCreated = await game.createGameToDatabase();
+        const game = new Game(roomCreated.room_id);
+        const gameCreated = await game.createGameToDatabase();
 
-      const gamePlayers = new GamePlayers(
-        parseInt(gameCreated.game_id),
-        parseInt(player.player_id),
-      );
-      const gamePlayersCreated =
-        await gamePlayers.createGamePlayersToDatabase();
+        const gamePlayers = new GamePlayers(
+          parseInt(gameCreated.game_id),
+          parseInt(player.player_id),
+        );
+        const gamePlayersCreated =
+          await gamePlayers.createGamePlayersToDatabase();
+      } catch (error) {
+        // Gérer l'erreur ici, par exemple, émettre un événement pour informer le client de l'échec de la création de la salle
+        socket.emit("create room error", {
+          message: "Error creating room"
+        });
+      }
+
     });
 
     socket.on("joinRoom", async ({
@@ -106,8 +117,6 @@ const initializeSocket = (server) => {
           io.to(roomId).emit("player joined room", username);
         }
 
-
-
       } catch (error) {
         console.error(
           "Erreur lors de la tentative de rejoindre la salle :",
@@ -115,6 +124,12 @@ const initializeSocket = (server) => {
         );
         socket.emit("joinRoomError", error.message);
       }
+    });
+
+    socket.on("start game", (roomId) => {
+      console.log("roomId [start game]", roomId)
+
+
     });
 
     // Disconnect

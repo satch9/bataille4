@@ -12,20 +12,20 @@ class Player {
 
   async saveCreatorToDatabase() {
     try {
-      const playerNameExist = await Player.findPlayerByName(this.player_name);
+      let player = await Player.findPlayerByName(this.player_name);
       //console.log("playerNameExist", playerNameExist)
-      if (playerNameExist.length === 0) {
-        let newPlayer = await sequelize.models.Player.create({
+      if (player.length === 0) {
+         player = await sequelize.models.Player.create({
           player_name: this.player_name,
           player_socket_id: this.player_socket_id,
         });
         //console.log("newPlayer", newPlayer)
-        return newPlayer;
       } else {
         console.warn("Joueur existant dans la base. On crée sa salle.");
-
-        return playerNameExist;
+        console.log("playerNameExist", player)
+        player = player[0]
       }
+      return player;
     } catch (error) {
       console.error(
         `Erreur lors de l'enregistrement du joueur ${this.player_name} dans la base de données :`,

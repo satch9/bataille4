@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { SocketContext, socket } from './context/SocketContext'
 import { Provider } from 'react-redux'
 import store from './redux/store'
@@ -14,7 +14,7 @@ import SignUpPage from './routes/sign-up'
 import Parameters from './components/Parameters'
 import GameBoard from './components/GameBoard'
 
-const router = createBrowserRouter([
+/* const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
@@ -25,14 +25,26 @@ const router = createBrowserRouter([
       { path: "/gameboard", element: <GameBoard /> },
     ]
   }
-])
+]) */
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
 
     <SocketContext.Provider value={socket} >
       <Provider store={store}>
-        <RouterProvider router={router} />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<RootLayout />}>
+              <Route index element={<IndexPage />} />
+              <Route path="sign-in" element={<SignInPage />} />
+              <Route path="sign-up" element={<SignUpPage />} />
+              <Route path="params" element={<Parameters />} />
+              <Route path="gameboard">
+                <Route path=":roomId" element={<GameBoard />} />
+              </Route>
+            </Route>
+          </Routes>
+        </BrowserRouter>
       </Provider>
     </SocketContext.Provider>
 

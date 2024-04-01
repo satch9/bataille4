@@ -25,7 +25,7 @@ const RoomList = ({ rooms }) => {
         roomId: room.room_id,
         username: user.username,
       });
-      navigate(`/gameboard?game=${room.room_id}`);
+      navigate(`/gameboard/${room.room_id}`);
     }, 2000);
   };
 
