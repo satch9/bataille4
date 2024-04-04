@@ -24,7 +24,7 @@ const CreateRoom = () => {
 
             const handleCreatedRoom = (data) => {
                 console.log("data created room", data)
-                dispatch(gameActions.setCreator(data.room_creator), true)
+                dispatch(gameActions.setCreator(data.room_creator))
                 dispatch(gameActions.setPlayerName(data.room_creator_name))
                 info(`Salle "${data.room_name}" créée par ${data.room_creator_name} avec un jeu de ${data.room_number_of_cards} cartes`);
             };

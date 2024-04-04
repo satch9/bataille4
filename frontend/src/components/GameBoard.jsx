@@ -7,45 +7,54 @@ import { actions as gameActions } from "../redux/reducers/gameReducer"
 
 
 const GameBoard = () => {
-    const { roomId } = useParams();
+    const { roomId } = useParams()
     const [messageApi, contextHolder] = message.useMessage()
     const socket = useContext(SocketContext)
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
     const game = useSelector(state => state.game)
-    const [isGameStarting, setIsGameStarting] = useState(false);
+    const [isGameStarting, setIsGameStarting] = useState(false)
 
     const info = useCallback((text) => {
-        messageApi.info(text);
+        messageApi.info(text)
     }, [messageApi])
 
-    console.log("game", game)
+
 
     useEffect(() => {
         const handleJoinedRoom = (data) => {
             console.log("data handlejoinedRoom : ", data)
             info(`Le joueur ${data.player_name} a rejoint la partie`)
-            dispatch(gameActions.setPlayers([...game.players, data.player_name]));
+            dispatch(gameActions.setPlayers(data.player_name))
+            socket.emit("updateGameState", game)
         }
 
         const handleGameStarted = () => {
             info('La partie peut commencer')
-            dispatch(gameActions.setGameStarted(true));
+            dispatch(gameActions.setGameStarted(true))
         }
 
+        const handleUpdateGameState = (data) => {
+            console.log("handleUpdateGameState: ", data)
+        }
+
+        socket.on("updateGameState", handleUpdateGameState)
         socket.on("player joined room", handleJoinedRoom)
         socket.on("game started", handleGameStarted)
+
+        console.log("game", game)
 
         return () => {
             socket.off("player joined room", handleJoinedRoom)
             socket.off("game started", handleGameStarted)
+            socket.off("updateGameState", handleUpdateGameState)
         }
-    }, [socket, info, dispatch, game.players])
+    }, [socket, info, dispatch, game.players, game])
 
     const handleStartGame = () => {
         // Send a "start game" message to the server
-        setIsGameStarting(true);
-        socket.emit("start game", (roomId));
-    };
+        setIsGameStarting(true)
+        socket.emit("start game", (roomId))
+    }
 
     return (
         <div className="game-board">

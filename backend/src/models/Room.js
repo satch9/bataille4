@@ -30,9 +30,9 @@ class Room {
       }
 
       // Récupérer les détails du joueur créateur
-      console.log("this.room_creator", this.room_creator)
+      //console.log("this.room_creator", this.room_creator)
       const creatorDetails = await Player.findPlayerById(this.room_creator);
-      console.log("creatorDetails", creatorDetails)
+      //console.log("creatorDetails", creatorDetails)
       if (creatorDetails) {
         room.room_creator_name = creatorDetails.player_name;
         await room.save();
