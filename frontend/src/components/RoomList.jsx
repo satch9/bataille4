@@ -31,6 +31,7 @@ const RoomList = ({ rooms }) => {
         [room.room_id]: false, // Définir l'état de chargement pour cet élément de la liste
       }));
       dispatch(gameActions.setPlayers([...game.players, user.username]));
+      dispatch(gameActions.setRoomId(room.room_id))
       // Ajoutez ici le code pour rejoindre la salle
       socket.emit("joinRoom", {
         roomId: room.room_id,

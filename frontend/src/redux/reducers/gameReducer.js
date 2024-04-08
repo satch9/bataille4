@@ -1,20 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+const initialState ={
+  gameId: null,
+  roomId: null,
+  playerName: '',
+  creator: null,
+  players: [],
+  cardsCreator: [],
+  cardsOpponent: [],
+  gameStarted: false,
+  turn: null,
+  phase: null,
+  currentPlayer: null,
+}
+
 const gameSlice = createSlice({
   name: 'game',
-  initialState: {
-    gameId: null,
-    roomId: null,
-    playerName: '',
-    creator: null,
-    players: [],
-    cardsCreator: [],
-    cardsOpponent: [],
-    gameStarted: false,
-    turn: null,
-    phase: null,
-    currentPlayer: null,
-  },
+  initialState,
   reducers: {
     setGameId(state, action) {
       return {
@@ -35,16 +37,28 @@ const gameSlice = createSlice({
       }
     },
     setCreator(state, action) {
-     return {
-        ...state,
-        creator: action.payload
-     }
-
-    },
-    setPlayers(state, action) {
       return {
         ...state,
-        players: [...state.players, action.payload],
+        creator: action.payload,
+      }
+    },
+    setPlayers(state, action) {
+      let newPlayers
+      if (Array.isArray(action.payload)) {
+        const uniquePlayers = action.payload.filter(
+          (player) => !state.players.includes(player),
+        )
+        newPlayers = [...state.players, ...uniquePlayers]
+      } else {
+        if (!state.players.includes(action.payload)) {
+          newPlayers = [...state.players, action.payload]
+        } else {
+          newPlayers = state.players
+        }
+      }
+      return {
+        ...state,
+        players: newPlayers,
       }
     },
     addCardsCreator(state, action) {
@@ -83,6 +97,9 @@ const gameSlice = createSlice({
         currentPlayer: action.payload,
       }
     },
+    resetGame() {
+      return gameSlice.initialState
+    },
   },
 })
 
@@ -99,6 +116,7 @@ export const {
   setTurn,
   setPhase,
   setCurrentPlayer,
+  resetGame,
 } = actions
 
 export default reducer

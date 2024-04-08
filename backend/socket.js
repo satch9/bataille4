@@ -32,11 +32,16 @@ const initializeSocket = (server) => {
   let disconnectedUsers = {}
   let globalGameState = {}
 
+  const game = new Game()
+  const player = new Player()
+  const room = new Room()
+  const gamesPlayers = new GamePlayers()
+
   io.on('connection', async (socket) => {
     const userId = socket.id
     console.log(`New connection: ${userId}`)
 
-    socket.on('updateGameState', (gameState) => {
+    /* socket.on('updateGameState', (gameState) => {
       const roomId = findRoomIdByUserId(userId)
       // Mettre à jour l'état global du jeu avec les données reçues du frontend
       globalGameState = gameState
@@ -46,7 +51,7 @@ const initializeSocket = (server) => {
 
       // Diffuser l'état mis à jour à tous les joueurs connectés
       io.to(roomId).emit('updateGameState', globalGameState)
-    })
+    }) */
 
     // Disconnect
     socket.on('disconnect', async () => {
@@ -109,31 +114,32 @@ const initializeSocket = (server) => {
       console.log('Creating a new room...', values)
 
       try {
-        const creator = new Player(userId, values.roomCreator)
-        const player = await creator.saveCreatorToDatabase()
+        const creator = await player.saveCreatorToDatabase(
+          userId,
+          values.roomCreator,
+        )
         //console.log('player saved in database [create room] : ', player)
 
-        const room = new Room(
+        const roomCreated = await room.createRoomToDatabase(
           values.roomName,
           values.roomNumCards,
-          player.player_id,
+          creator.player_id,
         )
-        const roomCreated = await room.createRoomToDatabase()
         //console.log('roomCreated', JSON.stringify(roomCreated, null, 2))
 
         socket.emit('created room', roomCreated)
         socket.join(roomCreated.room_id)
 
-        const game = new Game(roomCreated.room_id)
-        const gameCreated = await game.createGameToDatabase()
+        const gameCreated = await game.createGameToDatabase(roomCreated.room_id)
 
         socket.emit('created game', gameCreated)
 
-        const gamePlayers = new GamePlayers(
+        const gamePlayersCreated = await gamesPlayers.createGamePlayersToDatabase(
           parseInt(gameCreated.game_id),
-          parseInt(player.player_id),
+          parseInt(creator.player_id),
         )
-        const gamePlayersCreated = await gamePlayers.createGamePlayersToDatabase()
+
+        //console.log('gamePlayersCreated [create room]', gamePlayersCreated)
       } catch (error) {
         // Gérer l'erreur ici, par exemple, émettre un événement pour informer le client de l'échec de la création de la salle
         socket.emit('create room error', {
@@ -145,21 +151,21 @@ const initializeSocket = (server) => {
     socket.on('joinRoom', async ({ roomId, username }) => {
       try {
         // Vérifier si la salle existe
-        const room = await Room.findRoomById(roomId)
-        if (!room) throw "La salle n'existe pas."
+        const roomExisted = await Room.findRoomById(roomId)
+        if (!roomExisted) throw "La salle n'existe pas."
 
         // Ajouter le joueur à la salle
         const player = await Player.findPlayerByName(username)
-        console.log('player [joinRoom]', player)
+        //console.log('player [joinRoom]', player)
         if (player.length === 0) {
           const playerCreated = await Player.addPlayer(username, userId)
-          console.log(
+          /*console.log(
             'typeof playerCreated [joinRoom]',
             typeof playerCreated,
             playerCreated,
-          )
-          if (room.room_creator !== playerCreated.player_id) {
-            console.log('room joined joinRoom', roomId)
+          )*/
+          if (roomExisted.room_creator !== playerCreated.player_id) {
+            //console.log('room joined joinRoom', roomId)
             socket.join(roomId)
             // Mettre à jour les données de la salle pour inclure le joueur
             await GamePlayers.addPlayerToRoom(roomId, playerCreated)
@@ -167,7 +173,7 @@ const initializeSocket = (server) => {
           }
         } else {
           socket.join(roomId)
-          console.log('typeof player [joinRoom]', typeof player)
+          //console.log('typeof player [joinRoom]', typeof player)
           io.to(roomId).emit('player joined room', player[0])
         }
       } catch (error) {
@@ -179,11 +185,18 @@ const initializeSocket = (server) => {
       }
     })
 
-    socket.on('start game', (roomId) => {
-      console.log('roomId [start game]', roomId)
+    socket.on('start game', async ({ roomId, players }) => {
+      //console.log('roomId [start game]', roomId)
+      //console.log('players [start game]', players)
 
-      io.to(roomId).emit('game started', 'Game has been started')
-      GamePlayers.startGame(roomId)
+      await game.startGame(players)
+      let currentPlayer = await game.getCurrentPlayer()
+      let cards = await gamesPlayers.start(roomId)
+
+      console.log('currentPlayer [start game]', currentPlayer)
+      console.log('cards [start game]', cards)
+
+      io.to(parseInt(roomId)).emit('game started', { started: true, currentPlayer, cards })
     })
   })
 

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useCallback, useState } from "react"
+import { useContext, useEffect, useCallback } from "react"
 import { SocketContext } from "../context/SocketContext"
 import { message, Col, Row, Button } from "antd"
 import { useParams } from "react-router-dom"
@@ -12,7 +12,6 @@ const GameBoard = () => {
     const socket = useContext(SocketContext)
     const dispatch = useDispatch()
     const game = useSelector(state => state.game)
-    const [isGameStarting, setIsGameStarting] = useState(false)
 
     const info = useCallback((text) => {
         messageApi.info(text)
@@ -25,19 +24,30 @@ const GameBoard = () => {
             console.log("data handlejoinedRoom : ", data)
             info(`Le joueur ${data.player_name} a rejoint la partie`)
             dispatch(gameActions.setPlayers(data.player_name))
-            socket.emit("updateGameState", game)
+            //socket.emit("updateGameState", game)
         }
 
-        const handleGameStarted = () => {
-            info('La partie peut commencer')
-            dispatch(gameActions.setGameStarted(true))
+        const handleGameStarted = (data) => {
+            console.log("started [handleGameStarted]", data.started)
+            console.log("started [handleGameStarted]", data.currentPlayer)
+            console.log("started [handleGameStarted]", data.cards)
+            
+            if (data.started) {
+                info('La partie peut commencer')
+                dispatch(gameActions.addCardsCreator(data.cards[0]))
+                dispatch(gameActions.addCardsOpponent(data.cards[1]))
+                dispatch(gameActions.setCurrentPlayer(data.currentPlayer))
+                dispatch(gameActions.setTurn(data.currentPlayer))
+                dispatch(gameActions.setPhase("jouer"))
+                dispatch(gameActions.setGameStarted(data.started))
+            }
         }
 
-        const handleUpdateGameState = (data) => {
+        /* const handleUpdateGameState = (data) => {
             console.log("handleUpdateGameState: ", data)
-        }
+        } */
 
-        socket.on("updateGameState", handleUpdateGameState)
+        /* socket.on("updateGameState", handleUpdateGameState) */
         socket.on("player joined room", handleJoinedRoom)
         socket.on("game started", handleGameStarted)
 
@@ -46,25 +56,23 @@ const GameBoard = () => {
         return () => {
             socket.off("player joined room", handleJoinedRoom)
             socket.off("game started", handleGameStarted)
-            socket.off("updateGameState", handleUpdateGameState)
+            /* socket.off("updateGameState", handleUpdateGameState) */
         }
     }, [socket, info, dispatch, game.players, game])
 
     const handleStartGame = () => {
         // Send a "start game" message to the server
-        setIsGameStarting(true)
-        socket.emit("start game", (roomId))
+        socket.emit("start game", ({ roomId, players: game.players }))
     }
 
     return (
         <div className="game-board">
             {contextHolder}
             {
-                game.creator && game.players.length == 2 && (
+                game.creator && game.players.length == 2 && !game.gameStarted && (
                     <Button
                         type="primary"
                         onClick={handleStartGame}
-                        disabled={isGameStarting || game.gameStarted}
                     >
                         Débuter la partie
                     </Button>

@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const Card = require('./Cards')
+const Card = require('./Card')
 
 class Deck{
     constructor(numCards){

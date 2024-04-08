@@ -121,7 +121,7 @@ const GamePlayers = sequelize.define(
       defaultValue: 0,
     },
     gamePlayer_hand: {
-      type: DataTypes.TEXT("medium"),
+      type: DataTypes.JSON,
       allowNull: true,
     },
   }, {
