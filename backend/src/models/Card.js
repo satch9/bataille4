@@ -18,7 +18,7 @@ class Card {
             const labels32 = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
             return n > 31
                 ? null
-                : new Card(Card.suits[Math.trunc(n / 8)], values32[n % 8], labels32[n % 8]);
+                : new Card(Card.suits[Math.trunc(n / 8)], labels32[n % 8]);
         } else {
             return n > 51
                 ? null

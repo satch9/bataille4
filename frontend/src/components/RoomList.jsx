@@ -19,7 +19,7 @@ const RoomList = ({ rooms }) => {
 
   const handleJoinRoom = (room) => {
 
-    console.log("Joining room", JSON.stringify(room));
+    //console.log("Joining room", JSON.stringify(room));
     setLoadingState((prevState) => ({
       ...prevState,
       [room.room_id]: true, // Définir l'état de chargement pour cet élément de la liste

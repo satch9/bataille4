@@ -66,3 +66,73 @@ body {
 .game-board{
   width: 100%;
 }
+
+.player-hand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.face-down-pile {
+  position: relative;
+  width: 30px;
+  height: 40px;
+  border: 1px solid black;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.face-down-pile .card {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.face-up-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.face-up-pile .card {
+  margin-bottom: 5px;
+}
+
+.card {
+  width: 20px;
+  height: 28px;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.card.Hearts {
+  background-color: #ff4c4c;
+}
+
+.card.Diamonds {
+  background-color: #ff4c4c;
+}
+
+.card.Clubs {
+  background-color: #333;
+}
+
+.card.Spades {
+  background-color: #333;
+}
+
+.card .value {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+}

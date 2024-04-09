@@ -4,6 +4,7 @@ import { message, Col, Row, Button } from "antd"
 import { useParams } from "react-router-dom"
 import { useSelector, useDispatch } from 'react-redux'
 import { actions as gameActions } from "../redux/reducers/gameReducer"
+import PlayerHand from "./PlayerHand"
 
 
 const GameBoard = () => {
@@ -22,16 +23,29 @@ const GameBoard = () => {
     useEffect(() => {
         const handleJoinedRoom = (data) => {
             console.log("data handlejoinedRoom : ", data)
-            info(`Le joueur ${data.player_name} a rejoint la partie`)
-            dispatch(gameActions.setPlayers(data.player_name))
-            //socket.emit("updateGameState", game)
+            Object.keys(data).forEach(key => {
+                console.log("key", key)
+                if (key === "creator") {
+                    info(`Le joueur ${data.creator.player_name} a rejoint la partie`)
+                    dispatch(gameActions.setPlayers(data.creator.player_name))
+                    dispatch(gameActions.setCreatorName(data.creator.player_name))
+                }
+                if (key === "opponent") {
+                    info(`Le joueur ${data.opponent.player_name} a rejoint la partie`)
+                    dispatch(gameActions.setPlayers(data.opponent.player_name))
+                    /* dispatch(gameActions.setCreatorName(data.creator.player_name)) */
+                    dispatch(gameActions.setOpponentName(data.opponent.player_name))
+                }
+
+                //socket.emit("updateGameState", game)
+            })
         }
 
         const handleGameStarted = (data) => {
             console.log("started [handleGameStarted]", data.started)
             console.log("started [handleGameStarted]", data.currentPlayer)
             console.log("started [handleGameStarted]", data.cards)
-            
+
             if (data.started) {
                 info('La partie peut commencer')
                 dispatch(gameActions.addCardsCreator(data.cards[0]))
@@ -40,6 +54,8 @@ const GameBoard = () => {
                 dispatch(gameActions.setTurn(data.currentPlayer))
                 dispatch(gameActions.setPhase("jouer"))
                 dispatch(gameActions.setGameStarted(data.started))
+                dispatch(gameActions.setGameId(data.gameId))
+                dispatch(gameActions.setRoomId(data.roomId))
             }
         }
 
@@ -82,20 +98,34 @@ const GameBoard = () => {
 
             {
                 game.gameStarted && (
-                    <Row gutter={[8, 24]}>
-                        <Col style={{ background: '#0092ff', paddingTop: '8px', paddingBottom: '8px' }}
-                            xs={{ flex: '100%' }}
-                            sm={{ flex: '50%' }}
-                        >
-                            Créateur
-                        </Col>
-                        <Col style={{ background: '#337299', paddingTop: '8px', paddingBottom: '8px' }}
-                            xs={{ flex: '100%' }}
-                            sm={{ flex: '50%' }}
-                        >
-                            Adversaire
-                        </Col>
-                    </Row>
+                    <>
+                        <Row gutter={[8, 24]} style={{ marginBottom: '10px' }}>
+                            <Col style={{ background: '#0092ff', paddingTop: '8px', paddingBottom: '8px' }}
+                                xs={{ flex: '100%' }}
+                                sm={{ flex: '50%' }}
+                            >
+                                <p>{game.creatorName || "Créateur"}</p>
+                                <PlayerHand playerCards={game.cardsCreator} />
+
+                            </Col>
+
+                            <Col style={{ background: '#337299', paddingTop: '8px', paddingBottom: '8px' }}
+                                xs={{ flex: '100%' }}
+                                sm={{ flex: '50%' }}
+                            >
+                                <p>{game.opponentName}</p>
+                                <PlayerHand playerCards={game.cardsOpponent} />
+                            </Col>
+                        </Row>
+                        <Row gutter={[8, 24]}>
+                            <Col style={{ background: '#0000ff', paddingTop: '8px', paddingBottom: '8px' }}
+                                xs={{ flex: '100%' }}
+
+                            >
+                                Board
+                            </Col>
+                        </Row>
+                    </>
                 )
             }
 

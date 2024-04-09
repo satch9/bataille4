@@ -33,9 +33,9 @@ class Game {
     this.setStartDate()
     this.setCurrentPlayer(players)
 
-    console.log(
+    /*console.log(
       `The game has started! Current player is ${this.getCurrentPlayer()}`,
-    )
+    )*/
   }
 
   async setStartDate() {
@@ -85,6 +85,14 @@ class Game {
       )
       return parseInt(timeDiff / 1000) // returns time in seconds
     }
+  }
+
+  getGameId(){
+    return this.game_id
+  }
+
+  getRoomId(){
+    return this.game_room_id
   }
 }
 

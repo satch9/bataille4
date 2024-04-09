@@ -48,7 +48,7 @@ class GamePlayers {
     try {
       let gameplayers = await this.getAllFromGame(roomId)
       let numberOfCards = await Room.findRoomById(roomId)
-      console.log('numberOfCards', numberOfCards)
+      //console.log('numberOfCards', numberOfCards)
       let deck = new Deck(numberOfCards.room_number_of_cards)
       let handsPlayers = deck.deal()
       //console.log('handsPlayers [GamePlayers]', handsPlayers)

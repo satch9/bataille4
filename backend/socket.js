@@ -2,19 +2,19 @@ const { forEach, isInteger } = require('lodash')
 const socketio = require('socket.io')
 
 const initializeSocket = (server) => {
-  /* const io = socketio(server, {
-    cors: {
-      origin: "https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev", // Modifier en fonction de votre configuration frontend
-      methods: ["GET", "POST"],
-    }
-  }) */
-
   const io = socketio(server, {
+    cors: {
+      origin: 'https://fluffy-engine-g4ppg4xj655hwwp6-5173.app.github.dev', // Modifier en fonction de votre configuration frontend
+      methods: ['GET', 'POST'],
+    },
+  })
+
+  /* const io = socketio(server, {
     cors: {
       origin: 'http://localhost:5173', // Modifier en fonction de votre configuration frontend
       methods: ['GET', 'POST'],
     },
-  })
+  }) */
 
   /* const io = socketio(server, {
     cors: {
@@ -169,12 +169,14 @@ const initializeSocket = (server) => {
             socket.join(roomId)
             // Mettre à jour les données de la salle pour inclure le joueur
             await GamePlayers.addPlayerToRoom(roomId, playerCreated)
-            io.to(roomId).emit('player joined room', playerCreated)
+            io.to(roomId).emit('player joined room', {
+              opponent: playerCreated,
+            })
           }
         } else {
           socket.join(roomId)
           //console.log('typeof player [joinRoom]', typeof player)
-          io.to(roomId).emit('player joined room', player[0])
+          io.to(roomId).emit('player joined room', { creator: player[0] })
         }
       } catch (error) {
         console.error(
@@ -192,11 +194,18 @@ const initializeSocket = (server) => {
       await game.startGame(players)
       let currentPlayer = await game.getCurrentPlayer()
       let cards = await gamesPlayers.start(roomId)
+      let gameId = game.getGameId()
 
       console.log('currentPlayer [start game]', currentPlayer)
       console.log('cards [start game]', cards)
 
-      io.to(parseInt(roomId)).emit('game started', { started: true, currentPlayer, cards })
+      io.to(parseInt(roomId)).emit('game started', {
+        started: true,
+        currentPlayer,
+        cards,
+        gameId,
+        roomId,
+      })
     })
   })
 
