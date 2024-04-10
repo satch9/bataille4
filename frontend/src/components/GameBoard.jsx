@@ -99,10 +99,10 @@ const GameBoard = () => {
             {
                 game.gameStarted && (
                     <>
-                        <Row gutter={[8, 24]} style={{ marginBottom: '10px' }}>
+                        <Row gutter={[8, 24]} style={{ marginBottom: '10px',height: "180px", }}>
                             <Col style={{ background: '#0092ff', paddingTop: '8px', paddingBottom: '8px' }}
-                                xs={{ flex: '100%' }}
-                                sm={{ flex: '50%' }}
+                                xs={{ flex: '100%',  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                                sm={{ flex: '50%', height: "120px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                             >
                                 <p>{game.creatorName || "Créateur"}</p>
                                 <PlayerHand playerCards={game.cardsCreator} />
@@ -118,7 +118,7 @@ const GameBoard = () => {
                             </Col>
                         </Row>
                         <Row gutter={[8, 24]}>
-                            <Col style={{ background: '#0000ff', paddingTop: '8px', paddingBottom: '8px' }}
+                            <Col style={{ background: '#0000ff', paddingTop: '8px', paddingBottom: '8px', height: "120px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                                 xs={{ flex: '100%' }}
 
                             >

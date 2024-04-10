@@ -3,19 +3,15 @@ import PropTypes from "prop-types";
 import Card from "./Card";
 
 const PlayerHand = ({ playerCards }) => {
-  const [faceDownCards] = useState(playerCards);
+  const [faceDownCards, setFaceDownCards] = useState(playerCards);
   const [faceUpCards, setFaceUpCards] = useState([]);
 
-  const handleDrawCard = () => {
-    if (faceDownCards.length > 0) {
-      const drawnCard = faceDownCards.pop();
-      setFaceUpCards((prevCards) => [...prevCards, drawnCard]);
-    }
-  };
 
   const handleFlipCard = (index) => {
-    const flippedCard = faceDownCards.splice(index, 1)[0];
-    setFaceUpCards((prevCards) => [...prevCards, flippedCard]);
+    const cardToFlip = faceDownCards[index];
+    const newFaceDownCards = [...faceDownCards.slice(0, index), ...faceDownCards.slice(index + 1)];
+    setFaceDownCards(newFaceDownCards);
+    setFaceUpCards((prevCards) => [...prevCards, cardToFlip]);
   };
 
   return (
@@ -38,7 +34,6 @@ const PlayerHand = ({ playerCards }) => {
         ))}
       </div>
 
-      <button onClick={handleDrawCard}>Draw Card</button>
     </div>
   );
 };
