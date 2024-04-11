@@ -1,13 +1,16 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Card from "./Card";
+//import { useSelector } from 'react-redux';
+
 
 const PlayerHand = ({ playerCards }) => {
   const [faceDownCards, setFaceDownCards] = useState(playerCards);
   const [faceUpCards, setFaceUpCards] = useState([]);
-
+  //const game = useSelector(state => state.game)
 
   const handleFlipCard = (index) => {
+
     const cardToFlip = faceDownCards[index];
     const newFaceDownCards = [...faceDownCards.slice(0, index), ...faceDownCards.slice(index + 1)];
     setFaceDownCards(newFaceDownCards);

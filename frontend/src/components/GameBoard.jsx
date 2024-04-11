@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom"
 import { useSelector, useDispatch } from 'react-redux'
 import { actions as gameActions } from "../redux/reducers/gameReducer"
 import PlayerHand from "./PlayerHand"
-
+import { useUser } from '@clerk/clerk-react'
 
 const GameBoard = () => {
     const { roomId } = useParams()
@@ -13,6 +13,7 @@ const GameBoard = () => {
     const socket = useContext(SocketContext)
     const dispatch = useDispatch()
     const game = useSelector(state => state.game)
+    const { user } = useUser()
 
     const info = useCallback((text) => {
         messageApi.info(text)
@@ -26,15 +27,17 @@ const GameBoard = () => {
             Object.keys(data).forEach(key => {
                 console.log("key", key)
                 if (key === "creator") {
-                    info(`Le joueur ${data.creator.player_name} a rejoint la partie`)
-                    dispatch(gameActions.setPlayers(data.creator.player_name))
-                    dispatch(gameActions.setCreatorName(data.creator.player_name))
+                    info(`Le joueur ${data.creator[0].player_name} a rejoint la partie`)
+                    dispatch(gameActions.setPlayers(data.creator[0].player_name))
+                    dispatch(gameActions.setCreatorName(data.creator[0].player_name))
                 }
                 if (key === "opponent") {
-                    info(`Le joueur ${data.opponent.player_name} a rejoint la partie`)
-                    dispatch(gameActions.setPlayers(data.opponent.player_name))
-                    /* dispatch(gameActions.setCreatorName(data.creator.player_name)) */
-                    dispatch(gameActions.setOpponentName(data.opponent.player_name))
+                    info(`Le joueur ${data.opponent[0].player_name} a rejoint la partie`)
+                    dispatch(gameActions.setPlayers(data.opponent[0].player_name))
+                    dispatch(gameActions.setCreatorName(data.opponent[1]))
+                    dispatch(gameActions.setOpponentName(data.opponent[0].player_name))
+                    dispatch(gameActions.setCreator(data.opponent[2]))
+                    dispatch(gameActions.setPlayers(data.opponent[1]))
                 }
 
                 //socket.emit("updateGameState", game)
@@ -85,7 +88,7 @@ const GameBoard = () => {
         <div className="game-board">
             {contextHolder}
             {
-                game.creator && game.players.length == 2 && !game.gameStarted && (
+                game.creatorName === user.username && game.players.length == 2 && !game.gameStarted && (
                     <Button
                         type="primary"
                         onClick={handleStartGame}
@@ -99,13 +102,18 @@ const GameBoard = () => {
             {
                 game.gameStarted && (
                     <>
-                        <Row gutter={[8, 24]} style={{ marginBottom: '10px',height: "180px", }}>
+                        <Row gutter={[8, 24]} style={{ marginBottom: '10px', height: "180px", }}>
                             <Col style={{ background: '#0092ff', paddingTop: '8px', paddingBottom: '8px' }}
-                                xs={{ flex: '100%',  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                                xs={{ flex: '100%', display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                                 sm={{ flex: '50%', height: "120px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                             >
-                                <p>{game.creatorName || "Créateur"}</p>
-                                <PlayerHand playerCards={game.cardsCreator} />
+                                <p>{game.creatorName}</p>
+                                {
+                                    game.currentPlayer === user.username && (
+                                        <PlayerHand playerCards={game.cardsCreator} />
+                                    )
+                                }
+
 
                             </Col>
 
@@ -114,7 +122,12 @@ const GameBoard = () => {
                                 sm={{ flex: '50%' }}
                             >
                                 <p>{game.opponentName}</p>
-                                <PlayerHand playerCards={game.cardsOpponent} />
+                                {
+                                    game.currentPlayer !== user.username && (
+                                        <PlayerHand playerCards={game.cardsOpponent} />
+                                    )
+                                }
+
                             </Col>
                         </Row>
                         <Row gutter={[8, 24]}>
