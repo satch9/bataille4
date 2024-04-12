@@ -22,7 +22,7 @@ const Card = ({ suit, value, isFaceDown, onClick }) => {
 
   const cardStyles = {
     width: "63px",
-    height: "80px",
+    height: "63px",
     borderRadius: "5px",
     cursor: "pointer",
     position: "absolute",
@@ -33,7 +33,7 @@ const Card = ({ suit, value, isFaceDown, onClick }) => {
     transform: isFaceDown ? "rotateY(180deg)" : "none", // Rotation de la carte si face cachée
     backgroundImage: `url(${isFaceDown ? "../assets/js-badge.svg" : findSymbol(suit)})`, // Arrière-plan basé sur la face de la carte
     backgroundSize: "contain",
-    backgroundRepeat: "no-repeat",
+    backgroundRepeat: "repeat-y",
     
   }
 
@@ -43,7 +43,7 @@ const Card = ({ suit, value, isFaceDown, onClick }) => {
     fontWeight: "bold",
     color: "white",
     textAlign: "center", // Centre le texte horizontalement
-    width: "100%", // Utilise la largeur complète de l'élément parent
+    width: "95%", // Utilise la largeur complète de l'élément parent
     top: "50%", // Place le texte au milieu verticalement
     transform: "translateY(-50%)", // Déplace le texte vers le haut de 50% de sa propre hauteur
   };

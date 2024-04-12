@@ -1,20 +1,58 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useContext, useEffect, useState } from "react";
+import { SocketContext } from "../context/SocketContext"
+//import PropTypes from "prop-types";
 import Card from "./Card";
-//import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useUser } from '@clerk/clerk-react'
+import { setCurrentPlayer } from "../redux/reducers/gameReducer";
 
+const PlayerHand = () => {
+  const dispatch = useDispatch()
+  const game = useSelector((state) => state.game);
+  const creator = game.creatorName;
+  const creatorCards = game.cardsCreator;
+  const opponent = game.opponentName;
+  const opponentCards = game.cardsOpponent;
+  const currentPlayer = game.currentPlayer;
+  const { user } = useUser()
+  const socket = useContext(SocketContext)
 
-const PlayerHand = ({ playerCards }) => {
-  const [faceDownCards, setFaceDownCards] = useState(playerCards);
+  const [faceDownCards, setFaceDownCards] = useState([]);
   const [faceUpCards, setFaceUpCards] = useState([]);
   //const game = useSelector(state => state.game)
 
-  const handleFlipCard = (index) => {
+  
 
-    const cardToFlip = faceDownCards[index];
-    const newFaceDownCards = [...faceDownCards.slice(0, index), ...faceDownCards.slice(index + 1)];
-    setFaceDownCards(newFaceDownCards);
-    setFaceUpCards((prevCards) => [...prevCards, cardToFlip]);
+  useEffect(() => {
+    if (currentPlayer === user.username && currentPlayer === creator) {
+      setFaceDownCards(creatorCards);
+      setFaceUpCards([]);
+    } else {
+      setFaceDownCards(opponentCards);
+      setFaceUpCards([]);
+    }
+  }, [currentPlayer, creator, creatorCards, opponentCards, user.username])
+
+  const handleFlipCard = (index) => {
+    if (faceDownCards.length === 0) {
+      setFaceDownCards(faceUpCards);
+      setFaceUpCards([]);
+    } else {
+      const cardToFlip = faceDownCards[index];
+      const newFaceDownCards = [...faceDownCards.slice(0, index), ...faceDownCards.slice(index + 1)];
+      setFaceDownCards(newFaceDownCards);
+      setFaceUpCards((prevCards) => [...prevCards, cardToFlip]);
+
+      if (currentPlayer === user.username) {
+        socket.emit("flip-card", {
+          roomId: game.roomId,
+          card: cardToFlip,
+          player: user.username,
+          opponent: opponent,
+        });
+        dispatch(setCurrentPlayer(currentPlayer === opponent ? creator : opponent))
+      }
+    }
   };
 
   return (
@@ -41,13 +79,13 @@ const PlayerHand = ({ playerCards }) => {
   );
 };
 
-PlayerHand.propTypes = {
+/* PlayerHand.propTypes = {
   playerCards: PropTypes.arrayOf(
     PropTypes.shape({
       suit: PropTypes.oneOf(["Hearts", "Diamonds", "Clubs", "Spades"]).isRequired,
       value: PropTypes.oneOf(["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]).isRequired,
     })
   ).isRequired,
-};
+}; */
 
 export default PlayerHand;

@@ -88,7 +88,7 @@ const GameBoard = () => {
         <div className="game-board">
             {contextHolder}
             {
-                game.creatorName === user.username && game.players.length == 2 && !game.gameStarted && (
+                game.creatorName === user?.username && game.players.length == 2 && !game.gameStarted && (
                     <Button
                         type="primary"
                         onClick={handleStartGame}
@@ -108,9 +108,10 @@ const GameBoard = () => {
                                 sm={{ flex: '50%', height: "120px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
                             >
                                 <p>{game.creatorName}</p>
+
                                 {
-                                    game.currentPlayer === user.username && (
-                                        <PlayerHand playerCards={game.cardsCreator} />
+                                    game.currentPlayer !== user.username && (
+                                        <PlayerHand />
                                     )
                                 }
 
@@ -123,8 +124,8 @@ const GameBoard = () => {
                             >
                                 <p>{game.opponentName}</p>
                                 {
-                                    game.currentPlayer !== user.username && (
-                                        <PlayerHand playerCards={game.cardsOpponent} />
+                                    game.currentPlayer === user.username && (
+                                        <PlayerHand />
                                     )
                                 }
 

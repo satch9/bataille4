@@ -211,7 +211,21 @@ const initializeSocket = (server) => {
         currentPlayer,
         cards,
         gameId,
+        roomId: parseInt(roomId),
+      })
+    })
+
+    socket.on('flip-card', ({ roomId, card, player, opponent }) => {
+      console.log('roomId [flip-card]', roomId)
+      console.log('card [flip-card]', card)
+      console.log('player [flip-card]', player)
+      console.log('opponent [flip-card]', opponent)
+      io.to(roomId).emit('flipped-card', {
         roomId,
+        card,
+        player,
+        socketId: userId,
+        opponent,
       })
     })
   })
