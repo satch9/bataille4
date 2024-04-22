@@ -21,7 +21,7 @@ const PlayerHand = () => {
   const [faceUpCards, setFaceUpCards] = useState([]);
   //const game = useSelector(state => state.game)
 
-  
+
 
   useEffect(() => {
     if (currentPlayer === user.username && currentPlayer === creator) {
@@ -31,7 +31,16 @@ const PlayerHand = () => {
       setFaceDownCards(opponentCards);
       setFaceUpCards([]);
     }
-  }, [currentPlayer, creator, creatorCards, opponentCards, user.username])
+
+    socket.on("flipped-card", ({ roomId, card, player, socketId, opponent }) => {
+      console.log("roomId", roomId)
+      console.log("card", card)
+      console.log("player", player)
+      console.log("socketId", socketId)
+      console.log("opponent", opponent)
+    })
+
+  }, [currentPlayer, creator, creatorCards, opponentCards, user.username, socket])
 
   const handleFlipCard = (index) => {
     if (faceDownCards.length === 0) {
@@ -39,7 +48,8 @@ const PlayerHand = () => {
       setFaceUpCards([]);
     } else {
       const cardToFlip = faceDownCards[index];
-      const newFaceDownCards = [...faceDownCards.slice(0, index), ...faceDownCards.slice(index + 1)];
+      const newFaceDownCards = faceDownCards.slice();
+      newFaceDownCards.splice(index, 1);
       setFaceDownCards(newFaceDownCards);
       setFaceUpCards((prevCards) => [...prevCards, cardToFlip]);
 

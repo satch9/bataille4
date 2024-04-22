@@ -54,6 +54,7 @@ const GameBoard = () => {
                 dispatch(gameActions.addCardsCreator(data.cards[0]))
                 dispatch(gameActions.addCardsOpponent(data.cards[1]))
                 dispatch(gameActions.setCurrentPlayer(data.currentPlayer))
+                info(`C'est à ${data.currentPlayer} de commencer`)
                 dispatch(gameActions.setTurn(data.currentPlayer))
                 dispatch(gameActions.setPhase("jouer"))
                 dispatch(gameActions.setGameStarted(data.started))
@@ -110,9 +111,7 @@ const GameBoard = () => {
                                 <p>{game.creatorName}</p>
 
                                 {
-                                    game.currentPlayer !== user.username && (
-                                        <PlayerHand />
-                                    )
+                                    <PlayerHand />
                                 }
 
 
@@ -124,9 +123,7 @@ const GameBoard = () => {
                             >
                                 <p>{game.opponentName}</p>
                                 {
-                                    game.currentPlayer === user.username && (
                                         <PlayerHand />
-                                    )
                                 }
 
                             </Col>
